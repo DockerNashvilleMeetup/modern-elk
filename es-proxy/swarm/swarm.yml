@@ -1,0 +1,21 @@
+version: '3.3'
+
+networks:
+  elk-network:
+    external: true
+
+services:
+  es-proxy:
+    image: elk-demo-es-proxy:latest
+    networks:
+    - elk-network
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+      restart_policy:
+        condition: 'any'
+        delay: '30s'

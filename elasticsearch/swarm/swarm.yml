@@ -1,0 +1,90 @@
+version: '3.3'
+
+networks:
+  elk-network:
+    external: true
+
+volumes:
+  es_data_1:
+  es_data_2:
+  es_data_3:
+
+services:
+  es-node-01:
+    image: elk-demo-elasticsearch:latest
+    networks:
+    - elk-network
+    environment:
+      node.name: 'es-node-01'
+      network.publish_host: 'es-node-01'
+      discovery.zen.ping.unicast.hosts: 'es-node-02,es-node-03'
+      cluster.name: 'es-cluster'
+      node.master: 'true'
+      node.ingest: 'true'
+      node.data: 'true'
+      node.attr.zone: 'a' # shard allocation
+      ES_JAVA_OPTS: '-Xms256M -Xmx256M -XX:ParallelGCThreads=1 -XX:CICompilerCount=2' # prevent ES from overallocation resources
+    volumes:
+    - es_data_1:/usr/share/elasticsearch/data
+    stop_grace_period: '1m30s'
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512M'
+      restart_policy:
+        condition: 'any'
+        delay: '30s'
+  es-node-02:
+    image: elk-demo-elasticsearch:latest
+    networks:
+    - elk-network
+    environment:
+      node.name: 'es-node-02'
+      network.publish_host: 'es-node-02'
+      discovery.zen.ping.unicast.hosts: 'es-node-01,es-node-03'
+      cluster.name: 'es-cluster'
+      node.master: 'true'
+      node.ingest: 'true'
+      node.data: 'true'
+      node.attr.zone: 'b' # shard allocation
+      ES_JAVA_OPTS: '-Xms256M -Xmx256M -XX:ParallelGCThreads=1 -XX:CICompilerCount=2' # prevent ES from overallocation resources
+    volumes:
+    - es_data_2:/usr/share/elasticsearch/data
+    stop_grace_period: '1m30s'
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512M'
+      restart_policy:
+        condition: 'any'
+        delay: '30s'
+  es-node-03:
+    image: elk-demo-elasticsearch:latest
+    networks:
+    - elk-network
+    environment:
+      node.name: 'es-node-03'
+      network.publish_host: 'es-node-03'
+      discovery.zen.ping.unicast.hosts: 'es-node-01,es-node-02'
+      cluster.name: 'es-cluster'
+      node.master: 'true'
+      node.ingest: 'true'
+      node.data: 'true'
+      node.attr.zone: 'c' # shard allocation
+      ES_JAVA_OPTS: '-Xms256M -Xmx256M -XX:ParallelGCThreads=1 -XX:CICompilerCount=2' # prevent ES from overallocation resources
+    volumes:
+    - es_data_3:/usr/share/elasticsearch/data
+    stop_grace_period: '1m30s'
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512M'
+      restart_policy:
+        condition: 'any'
+        delay: '30s'

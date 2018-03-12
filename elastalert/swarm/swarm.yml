@@ -1,0 +1,26 @@
+version: '3.3'
+
+networks:
+  elk-network:
+    external: true
+
+services:
+  elastalert:
+    image: elk-demo-elastalert:latest
+    networks:
+    - elk-network
+    ports:
+    - '3030:3030'
+    environment:
+    - ELASTICSEARCH_PORT=9200
+    - ELASTICSEARCH_HOST=es-proxy
+    - ELASTALERT_SUPERVISOR_CONF=/opt/config/elastalert_supervisord.conf
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 60s
+      restart_policy:
+        condition: any
+        delay: 30s

@@ -1,0 +1,12 @@
+elasticsearch.url: 'http://es-proxy:9200'
+kibana.index: '.kibana-6'
+server.name: 'kibana'
+server.host: '0.0.0.0'
+
+xpack.monitoring.elasticsearch.url: 'http://es-proxy:9200'
+xpack.security.enabled: false
+xpack.monitoring.enabled: true
+xpack.monitoring.ui.container.elasticsearch.enabled: true
+xpack.apm.ui.enabled: false
+xpack.graph.enabled: false
+xpack.ml.enabled: false

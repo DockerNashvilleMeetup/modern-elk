@@ -1,0 +1,24 @@
+version: '3.3'
+
+networks:
+  elk-network:
+    external: true
+
+services:
+  kibana:
+    image: elk-demo-kibana:latest
+    networks:
+    - elk-network
+    ports:
+    - 5601:5601
+    environment:
+      SERVER_NAME: kibana
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1"
+          memory: 2G
+      restart_policy:
+        condition: any
+        delay: 30s

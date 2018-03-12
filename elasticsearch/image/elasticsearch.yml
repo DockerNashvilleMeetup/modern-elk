@@ -1,0 +1,45 @@
+path:
+  data:
+    - /usr/share/elasticsearch/data
+
+cluster:
+  routing:
+    allocation:
+      allow_rebalance: always
+      cluster_concurrent_rebalance: 2
+      awareness:
+        attributes: zone
+    rebalance:
+      enable: all
+
+network:
+  host: _site_
+
+http:
+  host: 0.0.0.0
+
+transport:
+  host: 0.0.0.0
+  ping_schedule: 5s
+  tcp:
+    compress: true
+
+discovery:
+  zen:
+    minimum_master_nodes: 2 # Default 1 || Formula (master_eligible_nodes / 2) + 1
+
+# X-Pack Settings
+xpack.ml.enabled: false
+xpack.security.enabled: false
+xpack.monitoring.enabled: true
+xpack.watcher.enabled: false
+xpack.license.self_generated.type: basic
+
+# Gateway Settings
+gateway:
+  expected_nodes: 3
+  recover_after_nodes: 2
+  recover_after_data_nodes: 1
+
+# Override CPU Detection
+processors: 1

@@ -1,0 +1,8 @@
+:9200 {
+  proxy / es-node-01:9200 es-node-02:9200 es-node-03:9200 {
+    transparent
+  }
+
+  errors stderr
+  tls off
+}

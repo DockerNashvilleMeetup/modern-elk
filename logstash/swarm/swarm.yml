@@ -1,0 +1,36 @@
+version: "3.3"
+
+networks:
+  elk-network:
+    external: true
+
+services:
+  logstash:
+    image: elk-demo-logstash:latest
+    networks:
+    - elk-network
+    environment:
+      LOGSPOUT: 'ignore'
+      LS_JAVA_OPTS: '-Xms256m -Xmx256m -XX:ParallelGCThreads=1 -XX:CICompilerCount=2 -Dnetworkaddress.cache.ttl=5 -Dnetworkaddress.cache.negative.ttl=5'
+    ports:
+    - "51415:51415/udp"
+    - "51415:51415/tcp"
+    - "12201:12201/udp"
+    - "12201:12201/tcp"
+    - "5050:5050/tcp"
+    - "5050:5050/udp"
+    deploy:
+      mode: replicated
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 60s
+        failure_action: rollback
+        monitor: 3m
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+      restart_policy:
+        condition: any
+        delay: 30s

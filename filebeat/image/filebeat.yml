@@ -1,0 +1,65 @@
+# Auto-discovery
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      templates:
+      - condition:
+          and:
+            - not:
+              contains:
+                docker.container.name: "_logstash"
+    
+        config:
+          - type: docker
+            containers.path: "/var/lib/docker/containers"
+            containers.ids: [ "${data.docker.container.id}" ]
+
+            tags: ["v6.2", "auto"]
+            
+            exclude_lines: [ "^\\s+[\\-`('.|_]" ] # Drop ASCII Art
+            close_inactive: 5m
+            close_renamed: true
+            close_removed: true
+            tail_files: true
+            clean_removed: true
+            close_timeout: 5m
+
+# Processor Types:
+# https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html
+processors:
+- drop_event:
+    when:
+      equals:
+        kibana.type: "response"
+      or:
+      - contains:
+          docker.container.name: "_logstash"
+
+# Get Docker Meta Data
+- add_docker_metadata:
+    host: "unix:///var/run/docker.sock"
+
+# Handle Kibana JSON
+- decode_json_fields:
+    fields:
+    - "message"
+    target: "kibana"
+    max_depth: 1
+    overwrite_keys: false
+    process_array: false
+    when:
+      contains:
+        docker.container.name: "_kibana"
+
+# Where to send the stuffs
+output.logstash:
+  enabled: true
+  hosts: ["logstash:5044"]
+  ttl: 30
+  slow_start: true
+
+# Dunno why it needs this yet
+setup.kibana.host: "http://kibana:5601"
+
+# CPUs
+max_procs: 1

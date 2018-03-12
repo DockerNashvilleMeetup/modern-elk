@@ -1,0 +1,15 @@
+http.host: '0.0.0.0'
+path.config: '/usr/share/logstash/pipeline'
+node.name: 'logstash'
+pipeline:
+  batch:
+    size: ${BATCH_SIZE:100}
+    delay: ${BATCH_DELAY:25}
+queue:
+  type: 'persisted'
+  drain: true
+  checkpoint.writes: 1024
+xpack:
+  monitoring:
+    enabled: true
+    elasticsearch.url: 'http://es-proxy:9200'

@@ -1,0 +1,33 @@
+version: '3.3'
+
+volumes:
+  filebeat_registry:
+    driver: 'local'
+
+networks:
+  elk-network:
+    external: true
+
+services:
+  filebeat:
+    image: elk-demo-filebeat:latest
+    environment:
+      max_procs: 1
+    networks:
+    - elk-network
+    volumes:
+    - /var/lib/docker/containers:/var/lib/docker/containers:rw # logs
+    - /var/run/docker.sock:/var/run/docker.sock:ro # get that metadata
+    - /var/log:/hostfs/var/log # system
+    - filebeat_registry:/usr/share/filebeat/data # log registry; log cache
+    deploy:
+      mode: global
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '.5'
+      restart_policy:
+        condition: any
+        delay: 30s
